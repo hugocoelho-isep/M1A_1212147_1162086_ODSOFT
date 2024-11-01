@@ -4,8 +4,8 @@ pipeline {
     environment {
 
         // LINUX
-        MAVEN_HOME = '/usr/share/maven'
-        JAVA_HOME = '/usr/share/java'
+        MAVEN_HOME = '/opt/homebrew/Cellar/maven/3.9.9/libexec'
+        JAVA_HOME = '/Users/miguelcarvalho/.sdkman/candidates/java/17.0.12-amzn'
 
         GITHUB_URL = 'https://github.com/hugocoelho-isep/M1A_1212147_1162086_ODSOFT.git'
         GITHUB_BRANCH = 'main'
@@ -65,6 +65,15 @@ pipeline {
                 sh "${MAVEN_HOME}/bin/mvn package"
             }
         }
+
+    stage('SonarQube Analysis') {
+        steps {
+            withSonarQubeEnv('SonarqubeDocker') {
+                sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=sonarproject -Dsonar.projectName=sonarproject -Dsonar.host.url=http://localhost:9000'
+                echo 'SonarQube Analysis Completed'
+            }
+        }
+    }
 
     }
 
