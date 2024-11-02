@@ -54,4 +54,46 @@ public class BioTest {
         bio.setBio("Some other bio");
         assertEquals("Some other bio", bio.toString());
     }
+
+    @Test
+    public void testSetBio_ValidBio() {
+        // Arrange
+        String validBio = "This is a valid biography.";
+
+        // Act
+        Bio bio = new Bio(validBio);
+
+        // Assert
+        assertEquals(validBio, bio.toString());
+    }
+
+    @Test
+    public void testSetBio_NullBio_ThrowsIllegalArgumentException() {
+        // Arrange
+        String nullBio = null;
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> new Bio(nullBio),
+                "Expected Bio constructor to throw IllegalArgumentException for null bio");
+    }
+
+    @Test
+    public void testSetBio_BlankBio_ThrowsIllegalArgumentException() {
+        // Arrange
+        String blankBio = "   ";
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> new Bio(blankBio),
+                "Expected Bio constructor to throw IllegalArgumentException for blank bio");
+    }
+
+    @Test
+    public void testSetBio_ExceedsMaxLength_ThrowsIllegalArgumentException() {
+        // Arrange
+        String longBio = "A".repeat(4097); // Bio with 4097 characters, exceeding the maximum length
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> new Bio(longBio),
+                "Expected Bio constructor to throw IllegalArgumentException for bio exceeding max length");
+    }
 }

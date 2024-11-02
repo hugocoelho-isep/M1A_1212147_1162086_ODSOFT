@@ -6,8 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pt.psoft.g1.psoftg1.authormanagement.model.Author;
 import pt.psoft.g1.psoftg1.authormanagement.repositories.AuthorRepository;
@@ -23,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-public class AuthorRepositoryIntegrationTest {
+public class AuthorRepositoryIT {
     @Autowired
     private TestEntityManager entityManager;
     @Autowired
@@ -126,19 +124,6 @@ public class AuthorRepositoryIntegrationTest {
         assertThat(authors).isEmpty();
     }
 
-//    @Test
-//    public void whenFindTopAuthorByLendings_thenReturnAuthorsSortedByLendings() {
-//        // given
-//        Pageable pageable = PageRequest.of(0, 2);
-//
-//        // when
-//        var topAuthors = authorRepository.findTopAuthorByLendings(pageable);
-//
-//        // then
-//        assertThat(topAuthors.getContent()).isNotEmpty(); // Customize with actual lending data
-//        // Further assertions would depend on the number of lendings assigned to authors
-//    }
-
     @Test
     public void whenDeleteAuthor_thenAuthorIsRemoved() {
         // given
@@ -152,18 +137,5 @@ public class AuthorRepositoryIntegrationTest {
         assertThat(found).isEmpty();
     }
 
-//    @Test
-//    public void givenAuthorWithCoAuthors_whenFindCoAuthorsByAuthorNumber_thenReturnCoAuthors() {
-//        // given
-//        // Set up book and co-author relationships in the entityManager here
-//        // Example: entityManager.persist(bookWithCoAuthors);
-//        // Replace author1.getAuthorNumber() with actual author numbers involved in co-authorship
-//
-//        // when
-//        List<Author> coAuthors = authorRepository.findCoAuthorsByAuthorNumber(author1.getAuthorNumber());
-//
-//        // then
-//        assertThat(coAuthors).containsExactly(author2); // Adjust based on actual setup
-//    }
 
 }
