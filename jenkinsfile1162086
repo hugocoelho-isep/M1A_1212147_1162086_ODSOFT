@@ -2,10 +2,8 @@ pipeline {
     agent any
 
     environment {
-
         MAVEN_HOME = '/usr/share/maven'
         JAVA_HOME = '/usr/share/java'
-
         GITHUB_URL = 'https://github.com/hugocoelho-isep/M1A_1212147_1162086_ODSOFT.git'
         GITHUB_BRANCH = 'main'
         GITHUB_ID = '22c33e88-6dc6-44e0-93bc-dd93dc7f0e31'
@@ -43,9 +41,9 @@ pipeline {
         }
 
         stage('Mutation Testing') {
-             steps {
-                 bat "${MAVEN_HOME}/bin/mvn org.pitest:pitest-maven:mutationCoverage"
-             }
+            steps {
+                bat "${MAVEN_HOME}/bin/mvn org.pitest:pitest-maven:mutationCoverage"
+            }
         }
 
         stage('Integration Tests') {
@@ -72,12 +70,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Deploy
-
+                echo 'Deployment step would go here'
             }
         }
     }
-
 
     post {
         success {
