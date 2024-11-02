@@ -1,9 +1,15 @@
-package pt.psoft.g1.psoftg1.bookmanagement.model;
+package pt.psoft.g1.psoftg1.bookmanagement.model.model;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.mockito.Mockito.*;
+
+import org.mockito.Mockito;
+import pt.psoft.g1.psoftg1.bookmanagement.model.Title;
+import pt.psoft.g1.psoftg1.bookmanagement.model.TitleFactory;
 
 class TitleTest {
 
@@ -66,5 +72,121 @@ class TitleTest {
         title.setTitle("Some other title");
         assertEquals("Some other title", title.toString());
     }
+
+ //novos
+ @Test
+ void ensureTitleRemovesMultipleWhitespacesbeforeandafter() {
+     final var title = new Title("   Some title   ");
+     assertEquals("Some title", title.toString());
+ }
+
+ @Test
+ void ensureTitleAllowsSpecialCharacters() {
+        final var title = new Title("Title with !@#$%^&*() special chars");
+        assertEquals("Title with !@#$%^&*() special chars", title.toString());
+    }
+
+    @Test
+    void ensureTitleWithMaxLength() {
+        String maxLengthTitle = "A".repeat(128);
+        final var title = new Title(maxLengthTitle);
+        assertEquals(maxLengthTitle, title.toString());
+    }
+
+    @Test
+    void ensureTitleExceedingMaxLengthThrowsException() {
+        String exceedingTitle = "A".repeat(129);
+        assertThrows(IllegalArgumentException.class, () -> new Title(exceedingTitle));
+    }
+
+    @Test
+    void testSetTitleWithValidValue() {
+        Title title = new Title("Initial Title");
+        title.setTitle("Updated Title");
+        assertEquals("Updated Title", title.getTitle());
+    }
+
+
+    @Test
+    void testValidateTitleCalledOnValidTitle() {
+    Title title = TitleFactory.createTitle("Some initial title");
+    Title spyTitle = Mockito.spy(title);
+
+    // Call the setTitle method
+    spyTitle.setTitle("Effective Java");
+
+    // Verify that setTitle is called when setting a valid title
+    verify(spyTitle).setTitle("Effective Java");
+    assertEquals("Effective Java", spyTitle.getTitle());
+}
+
+    @Test
+    void testSetTitleCalledWithNullTitleThrowsException() {
+        Title title = new Title("Initial Title");
+        Title spyTitle = Mockito.spy(title);
+
+        // Tenta definir um título nulo e espera uma exceção
+        assertThrows(IllegalArgumentException.class, () -> spyTitle.setTitle(null));
+
+        // Verifica se setTitle foi chamado com null
+        verify(spyTitle).setTitle(null);
+    }
+
+    @Test
+    void testSetTitleCalledWithBlankTitleThrowsException() {
+        Title title = new Title("Initial Title");
+        Title spyTitle = Mockito.spy(title);
+
+        // Tenta definir um título em branco e espera uma exceção
+        assertThrows(IllegalArgumentException.class, () -> spyTitle.setTitle(""));
+
+        // Verifica se setTitle foi chamado com uma string em branco
+        verify(spyTitle).setTitle("");
+    }
+
+    @Test
+    void testSetTitleCalledWithExceedingLengthTitleThrowsException() {
+        String longTitle = "A".repeat(129); // Título que excede o limite
+        Title title = new Title("Initial Title");
+        Title spyTitle = Mockito.spy(title);
+
+        // Tenta definir um título muito longo e espera uma exceção
+        assertThrows(IllegalArgumentException.class, () -> spyTitle.setTitle(longTitle));
+
+        // Verifica se setTitle foi chamado com o título longo
+        verify(spyTitle).setTitle(longTitle);
+    }
+
+    @Test
+    void testSetTitleTrimsWhitespace() {
+        Title title = new Title("Some initial title");
+        Title spyTitle = Mockito.spy(title);
+
+        // Define um título com espaços em branco no início e fim
+        spyTitle.setTitle("  Trimmed Title  ");
+
+        // Verifica se setTitle foi chamado com o título ajustado
+        verify(spyTitle).setTitle("  Trimmed Title  ");
+        assertEquals("Trimmed Title", spyTitle.getTitle());
+    }
+
+    @Test
+    void testSetTitleCalledOnlyOnceForSameTitle() {
+        Title title = new Title("Duplicate Title");
+        Title spyTitle = Mockito.spy(title);
+
+        // Define o mesmo título novamente
+        spyTitle.setTitle("Duplicate Title");
+
+        // Verifica que setTitle foi chamado apenas uma vez
+        verify(spyTitle).setTitle("Duplicate Title");
+        verifyNoMoreInteractions(spyTitle);
+    }
+
+
+
+
+
+
 
 }

@@ -1,14 +1,21 @@
-package pt.psoft.g1.psoftg1.bookmanagement.model;
+package pt.psoft.g1.psoftg1.bookmanagement.model.model;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import pt.psoft.g1.psoftg1.bookmanagement.model.Isbn;
 
-class DescriptionTest {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+
+class IsbnTest {
 
     @Test
-    void ensureDescriptionCanBeNull() {
-        assertDoesNotThrow(() -> new Description(null));
+    void ensureIsbnMustNotBeNull() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn(null));
+    }
+
+    @Test
+    void ensureIsbnMustNotBeBlank() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn(""));
     }
 
 
@@ -16,8 +23,8 @@ class DescriptionTest {
      * Text from <a href="https://www.lipsum.com/">Lorem Ipsum</a> generator.
      */
     @Test
-    void ensureDescriptionMustNotBeOversize() {
-        assertThrows(IllegalArgumentException.class, () -> new Description("\n" +
+    void ensureIsbnMustNotBeOversize() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("\n" +
                 "\n" +
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam venenatis semper nisl, eget condimentum felis tempus vitae. Morbi tempus turpis a felis luctus, ut feugiat tortor mattis. Duis gravida nunc sed augue ultricies tempor. Phasellus ultrices in dolor id viverra. Sed vitae odio ut est vestibulum lacinia sed sed neque. Mauris commodo, leo in tincidunt porta, justo mi commodo arcu, non ultricies ipsum dolor a mauris. Pellentesque convallis vulputate nisl, vel commodo felis ornare nec. Aliquam tristique diam dignissim hendrerit auctor. Mauris nec dolor hendrerit, dignissim urna non, pharetra quam. Sed diam est, convallis nec efficitur eu, sollicitudin ac nibh. In orci leo, dapibus ut eleifend et, suscipit sit amet felis. Integer lectus quam, tristique posuere vulputate sed, tristique eget sem.\n" +
                 "\n" +
@@ -37,16 +44,128 @@ class DescriptionTest {
     }
 
     @Test
-    void ensureDescriptionIsSet() {
-        final var description = new Description("Some description");
-        assertEquals("Some description", description.toString());
+    void ensureIsbn13IsSet() {
+        final var isbn = new Isbn("9782826012092");
+        assertEquals("9782826012092", isbn.toString());
     }
 
     @Test
-    void ensureDescriptionIsChanged() {
-        final var description = new Description("Some description");
-        description.setDescription("Some other description");
-        assertEquals("Some other description", description.toString());
+    void ensureChecksum13IsCorrect() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("9782826012099"));
     }
 
-}
+    @Test
+    void ensureIsbn10IsSet() {
+        final var isbn = new Isbn("8175257660");
+        assertEquals("8175257660", isbn.toString());
+    }
+
+    @Test
+    void ensureChecksum10IsCorrect() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("8175257667"));
+    }
+
+    // Opaque-Box Test: Invalid ISBN length
+    @Test
+    void testInvalidIsbnLength() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("123"));
+    }
+
+    @Test
+    void ensureIsbnWithInvalidCharactersThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("97828A601209"));
+    }
+
+    @Test
+    void ensureIncorrectLengthIsbnThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("1234567")); // Tamanho menor
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("97828260120921")); // Tamanho maior
+    }
+
+    @Test
+    void ensureInvalidPrefixIsbn13ThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("1234567890123"));
+    }
+
+    @Test
+    void ensureIsbn10WithXChecksumIsValid() {
+        Isbn isbn = new Isbn("0306406152"); // Exemplo com checksum correto
+        assertEquals("0306406152", isbn.toString());
+    }
+
+    @Test
+    void ensureFormattedIsbnWithSpacesOrHyphensThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("978-0-306-40615-7"));
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("978 0 306 40615 7"));
+    }
+
+    @Test
+    void ensureIsbn13WithValidPrefixes() {
+        Isbn isbn1 = new Isbn("9783161484100"); // Prefixo 978
+        assertEquals("9783161484100", isbn1.toString());
+
+        Isbn isbn2 = new Isbn("9791234567896"); // Prefixo 979
+        assertEquals("9791234567896", isbn2.toString());
+    }
+
+    @Test
+    void ensureIsbn13ChecksumValidation() {
+        assertThrows(IllegalArgumentException.class, () -> new Isbn("9783161484102")); // Dígito verificador incorreto
+    }
+
+
+
+
+
+
+
+
+
+
+    //novos transparente
+
+//    @Test
+//    void testValidateIsbnCalledOnValidIsbn() {
+//        Isbn spyIsbn = Mockito.spy(new Isbn("9780134757599"));
+//
+//        // Verify that validateIsbn is called for a valid ISBN
+//        verify(spyIsbn).Isbn("9780134757599");
+//        assertEquals("9780134757599", spyIsbn.toString());
+//    }
+//
+//    @Test
+//    void testValidateIsbnCalledOnShortIsbn() {
+//        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+//            Isbn spyIsbn = Mockito.spy(new Isbn("12345"));
+//        });
+//        // Verify that validateIsbn is called with a short ISBN
+//        verify(spyIsbn).validateIsbn("12345");
+//        assertEquals("Invalid ISBN format", thrown.getMessage());
+//
+//}
+//
+//    @Test
+//    void testValidateIsbnCalledOnNonNumericIsbn() {
+//        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+//            Isbn spyIsbn = Mockito.spy(new Isbn("97801347A7599"));
+//        });
+//
+//        // Verify that validateIsbn is called with a non-numeric ISBN
+//        verify(spyIsbn).validateIsbn("97801347A7599");
+//        assertEquals("Invalid ISBN format", thrown.getMessage());
+//    }
+//
+//    @Test
+//    void testValidateIsbnCalledOnNullIsbn() {
+//        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+//            Isbn spyIsbn = Mockito.spy(new Isbn(null));
+//        });
+//
+//        // Verify that validateIsbn is called when a null ISBN is set
+//        verify(spyIsbn).validateIsbn(null);
+//        assertEquals("ISBN cannot be null", thrown.getMessage());
+//    }
+
+
+    }
+

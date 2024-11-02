@@ -20,10 +20,10 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Clean') {
             steps {
                 // Clean, compile, and package the application using Maven
-                sh "${MAVEN_HOME}/bin/mvn clean install"
+                sh "${MAVEN_HOME}/bin/mvn clean"
             }
         }
         stage('Validate') {
@@ -66,14 +66,27 @@ pipeline {
             }
         }
 
-    stage('SonarQube Analysis') {
-        steps {
-            withSonarQubeEnv('SonarqubeDocker') {
-                sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=sonarproject -Dsonar.projectName=sonarproject -Dsonar.host.url=http://localhost:9000'
-                echo 'SonarQube Analysis Completed'
+
+
+        // run sonarqube test
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarqubeDocker') {
+                    sh 'export PATH=$PATH:/opt/homebrew/Cellar/maven/3.9.9/libexec/bin && mvn clean verify sonar:sonar -Dsonar.projectKey=sonarproject -Dsonar.projectName=sonarproject -Dsonar.host.url=http://localhost:9000'
+                    echo 'SonarQube Analysis Completed'
+
+                }
+
             }
         }
-    }
+        stage('Deploy') {
+                    steps {
+                        echo 'Deployment step would go here'
+                    }
+                }
+
+
+
 
     }
 

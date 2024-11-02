@@ -1,19 +1,16 @@
-package pt.psoft.g1.psoftg1.bookmanagement.model;
+package pt.psoft.g1.psoftg1.bookmanagement.model.model;
 
 import org.junit.jupiter.api.Test;
+import pt.psoft.g1.psoftg1.bookmanagement.model.Description;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class IsbnTest {
-
-    @Test
-    void ensureIsbnMustNotBeNull() {
-        assertThrows(IllegalArgumentException.class, () -> new Isbn(null));
-    }
+class DescriptionTest {
 
     @Test
-    void ensureIsbnMustNotBeBlank() {
-        assertThrows(IllegalArgumentException.class, () -> new Isbn(""));
+    void ensureDescriptionCanBeNull() {
+        assertDoesNotThrow(() -> new Description(null));
     }
 
 
@@ -21,8 +18,8 @@ class IsbnTest {
      * Text from <a href="https://www.lipsum.com/">Lorem Ipsum</a> generator.
      */
     @Test
-    void ensureIsbnMustNotBeOversize() {
-        assertThrows(IllegalArgumentException.class, () -> new Isbn("\n" +
+    void ensureDescriptionMustNotBeOversize() {
+        assertThrows(IllegalArgumentException.class, () -> new Description("\n" +
                 "\n" +
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam venenatis semper nisl, eget condimentum felis tempus vitae. Morbi tempus turpis a felis luctus, ut feugiat tortor mattis. Duis gravida nunc sed augue ultricies tempor. Phasellus ultrices in dolor id viverra. Sed vitae odio ut est vestibulum lacinia sed sed neque. Mauris commodo, leo in tincidunt porta, justo mi commodo arcu, non ultricies ipsum dolor a mauris. Pellentesque convallis vulputate nisl, vel commodo felis ornare nec. Aliquam tristique diam dignissim hendrerit auctor. Mauris nec dolor hendrerit, dignissim urna non, pharetra quam. Sed diam est, convallis nec efficitur eu, sollicitudin ac nibh. In orci leo, dapibus ut eleifend et, suscipit sit amet felis. Integer lectus quam, tristique posuere vulputate sed, tristique eget sem.\n" +
                 "\n" +
@@ -42,24 +39,97 @@ class IsbnTest {
     }
 
     @Test
-    void ensureIsbn13IsSet() {
-        final var isbn = new Isbn("9782826012092");
-        assertEquals("9782826012092", isbn.toString());
+    void ensureDescriptionIsSet() {
+        final var description = new Description("Some description");
+        assertEquals("Some description", description.toString());
     }
 
     @Test
-    void ensureChecksum13IsCorrect() {
-        assertThrows(IllegalArgumentException.class, () -> new Isbn("9782826012099"));
+    void ensureDescriptionIsChanged() {
+        final var description = new Description("Some description");
+        description.setDescription("Some other description");
+        assertEquals("Some other description", description.toString());
     }
 
     @Test
-    void ensureIsbn10IsSet() {
-        final var isbn = new Isbn("8175257660");
-        assertEquals("8175257660", isbn.toString());
+    void ensureDescriptionCanBeBlank() {
+        var description = new Description("");
+        assertNull(description.toString(), "Description should be null if set to a blank string");
     }
 
     @Test
-    void ensureChecksum10IsCorrect() {
-        assertThrows(IllegalArgumentException.class, () -> new Isbn("8175257667"));
+    void ensureDescriptionWithMaxLengthIsAccepted() {
+        String maxLengthDescription = "a".repeat(4096);
+        assertDoesNotThrow(() -> new Description(maxLengthDescription));
     }
+
+    @Test
+    void ensureDescriptionIsSanitized() {
+        var description = new Description("<script>alert('hack');</script>Clean text");
+        assertEquals("Clean text", description.toString(), "Description should be sanitized to remove HTML tags");
+    }
+
+    @Test
+    void ensureDescriptionCanBeResetToNull() {
+        var description = new Description("Some description");
+        description.setDescription(null);
+        assertNull(description.toString(), "Description should be null when reset to null");
+    }
+
+    @Test
+    void ensureDescriptionSetToEmptyStringBecomesNull() {
+        var description = new Description("Initial description");
+        description.setDescription("");
+        assertNull(description.toString(), "Description should be null when set to an empty string");
+    }
+
+    @Test
+    void ensureSettingSameValueDoesNotChange() {
+        var description = new Description("Same description");
+        description.setDescription("Same description");
+        assertEquals("Same description", description.toString(), "Setting the same value should not alter description.");
+    }
+
+    @Test
+    void ensureDescriptionAtMaxLengthAccepted() {
+        String maxLengthDescription = "a".repeat(4096);
+        assertDoesNotThrow(() -> new Description(maxLengthDescription), "Description at max length should be accepted");
+    }
+
+    @Test
+    void ensureDescriptionExceedingMaxLengthThrowsException() {
+        String overMaxLengthDescription = "a".repeat(4097);
+        assertThrows(IllegalArgumentException.class, () -> new Description(overMaxLengthDescription),
+                "Description exceeding max length should throw exception");
+    }
+
+
+    @Test
+    void ensureMaxLengthEnforcedOnUpdate() {
+        var description = new Description("Valid initial description");
+        String overMaxLengthDescription = "a".repeat(4097);
+        assertThrows(IllegalArgumentException.class, () -> description.setDescription(overMaxLengthDescription),
+                "Setting a description exceeding max length should throw exception");
+    }
+
+    @Test
+    void testSetDescriptionValid() {
+        String validDescription = "This is a valid description.";
+        Description description = new Description("Initial description");
+
+        description.setDescription(validDescription);
+
+        assertEquals(validDescription, description.toString());
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
