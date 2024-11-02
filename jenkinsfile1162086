@@ -48,7 +48,7 @@ pipeline {
 
         stage('Mutation Testing') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn org.pitest:pitest-maven:mutationCoverage"
+                bat "${MAVEN_HOME}\\bin\\mvn org.pitest:pitest-maven:mutationCoverage"
             }
         }
 
