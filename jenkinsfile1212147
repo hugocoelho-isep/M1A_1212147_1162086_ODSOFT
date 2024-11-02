@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     environment {
-    
+
         // LINUX
-        MAVEN_HOME = '/usr/share/maven'
-        JAVA_HOME = '/usr/share/java'
-        
-        GITHUB_URL = 'https://github.com/miguelvdsc/M1A_1212147_1162086.git'
+        MAVEN_HOME = '/opt/homebrew/Cellar/maven/3.9.9/libexec'
+        JAVA_HOME = '/Users/miguelcarvalho/.sdkman/candidates/java/17.0.12-amzn'
+
+        GITHUB_URL = 'https://github.com/hugocoelho-isep/M1A_1212147_1162086_ODSOFT.git'
         GITHUB_BRANCH = 'main'
         GITHUB_ID = 'githubcredentials'
     }
@@ -40,12 +40,24 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                // Run unit tests with Maven
-                sh "${MAVEN_HOME}/bin/mvn test"
-            }
-        }
+        stage('Unit Tests') {
+                    steps {
+                        sh "${MAVEN_HOME}/bin/mvn surefire:test"
+                    }
+                }
+
+        stage('Integration Tests') {
+                    steps {
+                        sh "${MAVEN_HOME}/bin/mvn failsafe:integration-test failsafe:verify"
+                    }
+                }
+
+        stage('Mutation Testing') {
+                     steps {
+                         sh "${MAVEN_HOME}/bin/mvn org.pitest:pitest-maven:mutationCoverage"
+                     }
+                }
+
 
         stage('Package') {
             steps {
@@ -53,6 +65,15 @@ pipeline {
                 sh "${MAVEN_HOME}/bin/mvn package"
             }
         }
+
+    stage('SonarQube Analysis') {
+        steps {
+            withSonarQubeEnv('SonarqubeDocker') {
+                sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=sonarproject -Dsonar.projectName=sonarproject -Dsonar.host.url=http://localhost:9000'
+                echo 'SonarQube Analysis Completed'
+            }
+        }
+    }
 
     }
 
