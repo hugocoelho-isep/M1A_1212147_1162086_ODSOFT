@@ -40,17 +40,18 @@ pipeline {
             }
         }
 
+        stage('Integration Tests') {
+            steps {
+                bat "${MAVEN_HOME}/bin/mvn failsafe:integration-test failsafe:verify"
+            }
+        }
+
         stage('Mutation Testing') {
             steps {
                 bat "${MAVEN_HOME}/bin/mvn org.pitest:pitest-maven:mutationCoverage"
             }
         }
 
-        stage('Integration Tests') {
-            steps {
-                bat "${MAVEN_HOME}/bin/mvn failsafe:integration-test failsafe:verify"
-            }
-        }
 
         stage('Install') {
             steps {

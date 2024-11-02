@@ -168,26 +168,6 @@
 					</includes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.pitest</groupId>
-				<artifactId>pitest-maven</artifactId>
-				<version>1.9.11</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>mutationCoverage</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<targetClasses>
-						<param>pt.psoft.g1.*</param> <!-- Ajuste o pacote conforme necessário -->
-					</targetClasses>
-					<targetTests>
-						<param>pt.psoft.g1.*</param> <!-- Ajuste o pacote conforme necessário -->
-					</targetTests>
-				</configuration>
-			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -261,10 +241,10 @@
 					</outputFormats>
 
 					<targetClasses>
-						<param>pt.psoft.g1.psoftg1.*</param>
+						<param>pt.psoft.g1.*.model.*</param>
 					</targetClasses>
 					<targetTests>
-						<param>pt.psoft.g1.psoftg1.*Test</param>
+						<param>pt.psoft.g1.*.model.*Test</param>
 					</targetTests>
 					<!--<verbose>true</verbose>-->
 				</configuration>
