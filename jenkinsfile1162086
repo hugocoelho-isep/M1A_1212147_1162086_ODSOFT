@@ -36,7 +36,7 @@ pipeline {
 
         stage('Unit Tests') {
             steps {
-                bat "${MAVEN_HOME}\\bin\\mvn surefire:test"
+                bat "${MAVEN_HOME}\\bin\\mvn test"
             }
         }
 
@@ -52,10 +52,8 @@ pipeline {
             }
         }
 
-
         stage('Install') {
             steps {
-                // Package the application into a JAR or WAR
                 bat "${MAVEN_HOME}\\bin\\mvn install -DskipTests"
             }
         }
@@ -69,9 +67,19 @@ pipeline {
             }
         }
 
+
+
         stage('Deploy') {
             steps {
-                echo 'Deployment step would go here'
+                script {
+                    echo '====== Starting Deploy Stage ======'
+                    // Parar qualquer execução anterior do JAR usando Windows commands
+                    bat '''
+                        for /f "tokens=5" %%a in ('netstat -ano ^| find "2228"') do taskkill /F /PID %%a 2>NUL || exit /b 0
+                        start /B java -jar target\\psoft-g1-0.0.1-SNAPSHOT.jar --server.port=2228
+                    '''
+                    echo '====== Finished Deploy Stage ======'
+                }
             }
         }
     }
