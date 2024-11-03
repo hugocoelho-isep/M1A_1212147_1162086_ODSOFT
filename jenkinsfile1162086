@@ -18,31 +18,31 @@ pipeline {
 
         stage('Clean') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn clean"
+                bat "${MAVEN_HOME}\\bin\\mvn clean"
             }
         }
 
         stage('Validate') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn validate"
+                bat "${MAVEN_HOME}\\bin\\mvn validate"
             }
         }
 
         stage('Compile') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn compile"
+                bat "${MAVEN_HOME}\\bin\\mvn compile"
             }
         }
 
         stage('Unit Tests') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn surefire:test"
+                bat "${MAVEN_HOME}\\bin\\mvn surefire:test"
             }
         }
 
         stage('Integration Tests') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn failsafe:integration-test failsafe:verify"
+                bat "${MAVEN_HOME}\\bin\\mvn failsafe:integration-test failsafe:verify"
             }
         }
 
@@ -56,7 +56,7 @@ pipeline {
         stage('Install') {
             steps {
                 // Package the application into a JAR or WAR
-                bat "${MAVEN_HOME}/bin/mvn install -DskipTests"
+                bat "${MAVEN_HOME}\\bin\\mvn install -DskipTests"
             }
         }
 
