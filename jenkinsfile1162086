@@ -36,7 +36,7 @@ pipeline {
 
         stage('Unit Tests') {
             steps {
-                bat "${MAVEN_HOME}\\bin\\mvn surefire:test"
+                bat "${MAVEN_HOME}\\bin\\mvn test"
             }
         }
 
@@ -49,15 +49,7 @@ pipeline {
         stage('Mutation Testing') {
             steps {
                 //bat "${MAVEN_HOME}\\bin\\mvn org.pitest:pitest-maven:mutationCoverage"
-                bat "${MAVEN_HOME}\\bin\\mvn org.pitest:pitest-maven:mutationCoverage -DtestPlugin=junit5 -DtargetClasses=pt.psoft.g1.*.model.* -DtargetTests=pt.psoft.g1.*.model.*Test -Dpitest.verbose=true"
-            }
-        }
-
-
-        stage('Install') {
-            steps {
-                // Package the application into a JAR or WAR
-                bat "${MAVEN_HOME}\\bin\\mvn install -DskipTests"
+                bat "${MAVEN_HOME}\\bin\\mvn org.pitest:pitest-maven:mutationCoverage"
             }
         }
 
@@ -69,6 +61,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Install') {
+            steps {
+                // Package the application into a JAR or WAR
+                bat "${MAVEN_HOME}\\bin\\mvn install -DskipTests"
+            }
+        }
+
+
 
         stage('Deploy') {
             steps {
