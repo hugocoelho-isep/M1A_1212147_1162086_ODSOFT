@@ -71,10 +71,13 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                bat '''
-                    for /f "tokens=5" %%a in ('netstat -ano ^| find "2228"') do taskkill /F /PID %%a 2>NUL || exit /b 0
-                    start /B java -jar target\\psoft-g1-0.0.1-SNAPSHOT.jar --server.port=2228
-                '''
+                script {
+                    // Finaliza qualquer instância antiga da aplicação
+                    bat 'taskkill /F /IM java.exe || echo "No Java process running"'
+
+                    // Inicia a aplicação em background
+                    bat 'start "" java -jar target\\psoft-g1-0.0.1-SNAPSHOT.jar'
+                }
             }
         }
     }
