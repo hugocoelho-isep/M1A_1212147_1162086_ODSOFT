@@ -48,7 +48,6 @@ pipeline {
 
         stage('Mutation Testing') {
             steps {
-                //bat "${MAVEN_HOME}\\bin\\mvn org.pitest:pitest-maven:mutationCoverage"
                 bat "${MAVEN_HOME}\\bin\\mvn org.pitest:pitest-maven:mutationCoverage"
             }
         }
@@ -64,7 +63,6 @@ pipeline {
 
         stage('Install') {
             steps {
-                // Package the application into a JAR or WAR
                 bat "${MAVEN_HOME}\\bin\\mvn install -DskipTests"
             }
         }
@@ -73,7 +71,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deployment step would go here'
+                bat '''
+                    for /f "tokens=5" %%a in ('netstat -ano ^| find "2228"') do taskkill /F /PID %%a 2>NUL || exit /b 0
+                    start /B java -jar target\\psoft-g1-0.0.1-SNAPSHOT.jar --server.port=2228
+                '''
             }
         }
     }
