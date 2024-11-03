@@ -1,3 +1,5 @@
+
+
 pipeline {
     agent any
 
@@ -42,7 +44,7 @@ pipeline {
 
         stage('Unit Tests') {
                     steps {
-                        sh "${MAVEN_HOME}/bin/mvn surefire:test"
+                        sh "${MAVEN_HOME}/bin/mvn test"
                     }
                 }
 
@@ -51,12 +53,14 @@ pipeline {
                         sh "${MAVEN_HOME}/bin/mvn failsafe:integration-test failsafe:verify"
                     }
                 }
-
+                
         stage('Mutation Testing') {
                      steps {
                          sh "${MAVEN_HOME}/bin/mvn org.pitest:pitest-maven:mutationCoverage"
                      }
                 }
+
+        
 
 
         stage('Package') {
@@ -79,27 +83,12 @@ pipeline {
 
             }
         }
-        stage('Deploy') {
-                    steps {
-                        echo 'Deployment step would go here'
-                    }
-                }
-
-
-
-
+        
+       stage('Deploy') {
+    steps {
+        
+            sh "cd target && JENKINS_NODE_COOKIE=donkillme nohup java -jar psoft-g1-0.0.1-SNAPSHOT.jar --server.port=2228 > nohup.out 2>&1 &"
     }
-
-
-
-    post {
-        success {
-            // Actions to take when the pipeline succeeds
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            // Actions to take when the pipeline fails
-            echo 'Pipeline failed!'
-        }
+    }
     }
 }
