@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pt.psoft.g1.psoftg1.authormanagement.services.CreateAuthorRequest;
 import pt.psoft.g1.psoftg1.authormanagement.services.UpdateAuthorRequest;
+import pt.psoft.g1.psoftg1.exceptions.ConflictException;
 import pt.psoft.g1.psoftg1.shared.model.EntityWithPhoto;
 import pt.psoft.g1.psoftg1.shared.model.Photo;
 
@@ -21,6 +22,7 @@ class AuthorTest {
     @BeforeEach
     void setUp() {
     }
+
     @Test
     void ensureNameNotNull(){
         assertThrows(IllegalArgumentException.class, () -> new Author(null,validBio, null));
@@ -82,5 +84,61 @@ class AuthorTest {
         assertNotNull(photo);
         assertEquals("photoTest.jpg", photo.getPhotoFile());
     }
+
+    @Test
+    public void testApplyPatch_Success() {
+        // arrange
+        Author author = AuthorFactory.createAuthor("Author Name", "Author Bio", null);
+        UpdateAuthorRequest updateRequest = new UpdateAuthorRequest();
+        updateRequest.setName("Updated Name");
+        updateRequest.setBio("Updated Bio");
+        long currentVersion = author.getVersion();
+
+        // act
+        author.applyPatch(currentVersion, updateRequest);
+
+        // assert
+        assertEquals("Updated Name", author.getName());
+        assertEquals("Updated Bio", author.getBio());
+    }
+
+    @Test
+    public void testApplyPatch_ThrowsStaleObjectStateException() {
+        // arrange
+        Author author = AuthorFactory.createAuthor("Author Name", "Author Bio", null);
+        UpdateAuthorRequest updateRequest = new UpdateAuthorRequest();
+        updateRequest.setName("Updated Name");
+        updateRequest.setBio("Updated Bio");
+        long incorrectVersion = author.getVersion() + 1;
+
+        // act + assert
+        assertThrows(StaleObjectStateException.class, () -> author.applyPatch(incorrectVersion, updateRequest),
+                "Expected applyPatch to throw StaleObjectStateException for version mismatch");
+    }
+
+    @Test
+    public void testRemovePhoto_Success() {
+        // Arrange: Use the correct version for removal
+        Author author = AuthorFactory.createAuthor("Author Name", "Author Bio", null);
+        long currentVersion = author.getVersion();
+
+        // Act
+        author.removePhoto(currentVersion);
+
+        // Assert: Photo URI should be null after successful removal
+        assertNull(author.getPhoto(), "Photo URI should be null after removal");
+    }
+
+    @Test
+    public void testRemovePhoto_ThrowsConflictException() {
+        // Arrange: Set an incorrect version for removal
+        Author author = AuthorFactory.createAuthor("Author Name", "Author Bio", null);
+        long incorrectVersion = author.getVersion() + 1;
+
+        // Act & Assert: Expect ConflictException due to version mismatch
+        assertThrows(ConflictException.class, () -> author.removePhoto(incorrectVersion),
+                "Expected removePhoto to throw ConflictException for version mismatch");
+    }
+
 }
 
