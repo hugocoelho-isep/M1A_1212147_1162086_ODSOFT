@@ -72,15 +72,15 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Identifica e mata o processo que está usando a porta 2228
+                    // Mata o processo que está usando a porta 2228, se existir
                     bat '''
                         for /f "tokens=5" %%a in ('netstat -aon ^| find ":2228" ^| find "LISTENING"') do (
                             taskkill /F /PID %%a
-                        )
+                        ) || echo "Nenhum processo encontrado na porta 2228"
                     '''
 
                     // Inicia a aplicação na porta 2228
-                    bat 'start "" java -jar target\\psoft-g1-0.0.1-SNAPSHOT.jar --server.port=2228'
+                    bat 'start "" java -jar target\\seu-artefato.jar --server.port=2228'
                 }
             }
         }
