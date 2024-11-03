@@ -52,6 +52,12 @@ pipeline {
             }
         }
 
+        stage('Install') {
+            steps {
+                bat "${MAVEN_HOME}\\bin\\mvn install -DskipTests"
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqubeServer') {
@@ -61,26 +67,18 @@ pipeline {
             }
         }
 
-        stage('Install') {
-            steps {
-                bat "${MAVEN_HOME}\\bin\\mvn install -DskipTests"
-            }
-        }
-
 
 
         stage('Deploy') {
             steps {
                 script {
-                    // Mata o processo que está usando a porta 2228, se existir
+                    echo '====== Starting Deploy Stage ======'
+                    // Parar qualquer execução anterior do JAR usando Windows commands
                     bat '''
-                        for /f "tokens=5" %%a in ('netstat -aon ^| find ":2228" ^| find "LISTENING"') do (
-                            taskkill /F /PID %%a
-                        ) || echo "Nenhum processo encontrado na porta 2228"
+                        for /f "tokens=5" %%a in ('netstat -ano ^| find "2228"') do taskkill /F /PID %%a 2>NUL || exit /b 0
+                        start /B java -jar target\\psoft-g1-0.0.1-SNAPSHOT.jar --server.port=2228
                     '''
-
-                    // Inicia a aplicação na porta 2228
-                    bat 'start "" java -jar target\\seu-artefato.jar --server.port=2228'
+                    echo '====== Finished Deploy Stage ======'
                 }
             }
         }
