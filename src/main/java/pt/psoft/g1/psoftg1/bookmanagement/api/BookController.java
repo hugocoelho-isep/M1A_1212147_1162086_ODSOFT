@@ -54,7 +54,7 @@ public class BookController {
     @Operation(summary = "Register a new Book")
     @PutMapping(value = "/{isbn}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<BookView> create( CreateBookRequest resource, @PathVariable("isbn") String isbn) {
+    public ResponseEntity<BookView> create( @RequestBody CreateBookRequest resource, @PathVariable("isbn") String isbn) {
 
 
         //Guarantee that the client doesn't provide a link on the body, null = no photo or error
@@ -98,7 +98,7 @@ public class BookController {
 
     @Operation(summary = "Deletes a book photo")
     @DeleteMapping("/{isbn}/photo")
-    public ResponseEntity<Void> deleteBookPhoto(@PathVariable("isbn") final String isbn) {
+    public ResponseEntity<Void> deleteBookPhoto(@PathVariable("isbn") @RequestBody final String isbn) {
 
         var book = bookService.findByIsbn(isbn);
         if(book.getPhoto() == null) {
@@ -140,7 +140,7 @@ public class BookController {
     @PatchMapping(value = "/{isbn}")
     public ResponseEntity<BookView> updateBook(@PathVariable final String isbn,
                                                final WebRequest request,
-                                               @Valid final UpdateBookRequest resource) {
+                                               @Valid @RequestBody final UpdateBookRequest resource) {
 
         final String ifMatchValue = request.getHeader(ConcurrencyService.IF_MATCH);
         if (ifMatchValue == null || ifMatchValue.isEmpty() || ifMatchValue.equals("null")) {
