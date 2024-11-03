@@ -130,19 +130,6 @@ class BookTest {
 
 
 
-//    @Test
-//    public void testRemovePhoto() {
-//        Genre genre = new Genre("Fantasy");
-//        List<Author> authors = List.of(new Author("Author Name"));
-//        Book book = new Book("1234567890123", "Title", "Description", genre, authors, "photoURI");
-//
-//        Long currentVersion = book.getVersion();
-//        book.removePhoto(currentVersion);
-//
-//        assertNull(book.getPhotoURI());
-//    }
-
-
 }
 
 
