@@ -6,9 +6,9 @@ pipeline {
         MAVEN_HOME = '/usr/share/maven'
         JAVA_HOME = '/usr/share/java'
 
-        GITHUB_URL = 'https://github.com/miguelvdsc/M1A_1212147_1162086.git'
+        GITHUB_URL = 'https://github.com/hugocoelho-isep/M1A_1212147_1162086_ODSOFT.git'
         GITHUB_BRANCH = 'main'
-        GITHUB_ID = 'githubcredentials'
+        GITHUB_ID = 'githubtoken'
     }
 
     stages {
@@ -18,11 +18,12 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Clean') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn clean install"
+                sh "${MAVEN_HOME}/bin/mvn clean"
             }
         }
+
         stage('Validate') {
             steps {
                 sh "${MAVEN_HOME}/bin/mvn validate"
@@ -35,28 +36,46 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Unit Tests') {
             steps {
                 sh "${MAVEN_HOME}/bin/mvn test"
             }
         }
 
-        stage('Package') {
+        stage('Integration Tests') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn package"
+                sh "${MAVEN_HOME}/bin/mvn failsafe:integration-test failsafe:verify"
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Mutation Testing') {
             steps {
-                withSonarQubeEnv('sonarqubeServer') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=lms-sonar -Dsonar.projectName='lms-sonar' -Dsonar.host.url=http://localhost:9000' //port 9000 is default for sonar
-                    echo 'SonarQube Analysis Completed'
+                sh "${MAVEN_HOME}/bin/mvn org.pitest:pitest-maven:mutationCoverage"
+            }
+        }
+
+        stage('Install') {
+            steps {
+                sh "${MAVEN_HOME}/bin/mvn install -DskipTests"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    echo '====== Starting Deploy Stage ======'
+                    // Parar qualquer execução anterior do JAR usando Windows commands
+                   sh '''
+                       PID=$(lsof -t -i:2228)
+                       if [ -n "$PID" ]; then
+                           kill -9 $PID
+                       fi
+                       nohup java -jar target/psoft-g1-0.0.1-SNAPSHOT.jar --server.port=2228 > /dev/null 2>&1 &
+                   '''
+                    echo '====== Finished Deploy Stage ======'
                 }
             }
         }
-
-
 
     }
 
